@@ -95,8 +95,8 @@ Default database, Native mode, `nam5` (US multi-region), collection: `investigat
 ### Install
 
 ```bash
-git clone https://github.com/gbhorne/adk-autosoc.git
-cd adk-autosoc
+git clone https://github.com/gbhorne/adk-security-agents.git
+cd adk-security-agents
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\Activate.ps1
 pip install -r requirements.txt

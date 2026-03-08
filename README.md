@@ -52,7 +52,7 @@ Generates a three-sentence CISO-ready natural language summary using Gemini via 
 | Agent memory | Firestore (investigation state) |
 | Event bus | Cloud Pub/Sub (4 topics, 4 subscriptions) |
 | Data store | BigQuery (findings, baselines, timelines) |
-| Evidence store | Cloud Storage (autosoc-sec-evidence) |
+| Evidence store | Cloud Storage |
 | IAM enrichment | Cloud Asset Inventory API |
 | Audit logs | Cloud Logging API |
 | Human gate | Slack webhook |
@@ -62,15 +62,11 @@ Generates a three-sentence CISO-ready natural language summary using Gemini via 
 
 ## GCP Infrastructure
 
-### Project
-- Project ID: `sec-autosoc`
-- Region: `us-central1`
-
 ### APIs Enabled
 `run.googleapis.com`, `cloudfunctions.googleapis.com`, `pubsub.googleapis.com`, `firestore.googleapis.com`, `bigquery.googleapis.com`, `securitycenter.googleapis.com`, `cloudasset.googleapis.com`, `aiplatform.googleapis.com`, `logging.googleapis.com`, `artifactregistry.googleapis.com`, `storage.googleapis.com`
 
-### Service Account
-`autosoc-sa@sec-autosoc.iam.gserviceaccount.com` with roles: `bigquery.dataEditor`, `bigquery.jobUser`, `pubsub.editor`, `datastore.user`, `logging.viewer`, `securitycenter.findingsViewer`, `cloudasset.viewer`, `run.invoker`, `aiplatform.user`, `storage.admin`
+### Service Account Roles
+`bigquery.dataEditor`, `bigquery.jobUser`, `pubsub.editor`, `datastore.user`, `logging.viewer`, `securitycenter.findingsViewer`, `cloudasset.viewer`, `run.invoker`, `aiplatform.user`, `storage.admin`
 
 ### Pub/Sub Topics
 | Topic | Subscription |
@@ -99,8 +95,8 @@ Default database, Native mode, `nam5` (US multi-region), collection: `investigat
 ### Install
 
 ```bash
-git clone https://github.com/yourusername/autosoc
-cd autosoc
+git clone https://github.com/gbhorne/adk-autosoc.git
+cd adk-autosoc
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\Activate.ps1
 pip install -r requirements.txt
@@ -139,9 +135,9 @@ Investigate this GCP security finding:
 
 Finding ID: finding-001
 Category: PUBLIC_BUCKET
-Resource: gs://test-exposed-bucket-001
+Resource: gs://your-bucket-name
 Severity: HIGH
-Principal: test-sa@sec-autosoc.iam.gserviceaccount.com
+Principal: your-service-account@your-project.iam.gserviceaccount.com
 
 Run the full investigation through all 6 steps.
 ```
@@ -168,58 +164,37 @@ Run the full investigation through all 6 steps.
 python -m scripts.verify_autosoc
 ```
 
-This script checks all infrastructure components and runs a live end-to-end detection test. Expected output:
-
-```
-==============================
-  GCP Authentication
-==============================
-  [PASS] Application Default Credentials: project=sec-autosoc
-  [PASS] GCP Project accessible: project_id=sec-autosoc, state=ACTIVE
-
-  ...
-
-  STATUS: ALL CHECKS PASSED - AutoSOC infrastructure is fully operational
-```
-
-A full verification pass output is included in [`docs/VERIFICATION_PASS.txt`](docs/VERIFICATION_PASS.txt). This run confirmed 33/33 checks passing across GCP authentication, all 4 Pub/Sub topics and subscriptions, BigQuery dataset and tables (5 live findings), Firestore (3 resolved investigations), Cloud Storage, Vertex AI Gemini, Cloud Asset Inventory, Cloud Logging, all 9 agent module imports, and a live end-to-end detection test.
+This script checks all infrastructure components and runs a live end-to-end detection test. A full verification pass output is included in [`docs/VERIFICATION_PASS.txt`](docs/VERIFICATION_PASS.txt), confirming 33/33 checks passing across GCP authentication, all 4 Pub/Sub topics and subscriptions, BigQuery dataset and tables, Firestore, Cloud Storage, Vertex AI Gemini, Cloud Asset Inventory, Cloud Logging, all 9 agent module imports, and a live end-to-end detection test.
 
 ---
 
-## Project Structure
+## Repository Structure
 
 ```
-autosoc/
-├── .env
-├── requirements.txt
-├── autosoc_agent/
-│   ├── __init__.py
-│   └── agent.py          # ADK root_agent with 6 tools
-├── agents/
-│   ├── detection/agent.py
-│   ├── orchestrator/agent.py
-│   ├── triage/agent.py
-│   ├── threat_intel/agent.py
-│   ├── forensics/agent.py
-│   ├── remediation/agent.py
-│   └── reporting/agent.py
-├── shared/
-│   ├── config.py         # All constants and configuration
-│   ├── models.py         # Pydantic models for all data structures
-│   └── pubsub_client.py  # Pub/Sub publish/subscribe utilities
-├── docs/
-│   ├── architecture.svg          # System architecture diagram
-│   ├── VERIFICATION_PASS.txt     # Live 33/33 infrastructure verification
-│   └── QA.md                     # In-depth technical Q&A
-└── tools/                # Future: discrete GCP tool functions
+adk-autosoc/
+    autosoc_agent/
+        __init__.py
+        agent.py              # ADK root_agent with 6 tools
+    agents/
+        detection/agent.py
+        orchestrator/agent.py
+        triage/agent.py
+        threat_intel/agent.py
+        forensics/agent.py
+        remediation/agent.py
+        reporting/agent.py
+    shared/
+        config.py             # All constants and configuration
+        models.py             # Pydantic models for all data structures
+        pubsub_client.py      # Pub/Sub publish/subscribe utilities
+    docs/
+        architecture.svg
+        VERIFICATION_PASS.txt
+        QA.md                 # In-depth technical Q&A
+    scripts/
+        verify_autosoc.py
+    requirements.txt
 ```
-
-
----
-
-## Q&A
-
-See [docs/QA.md](docs/QA.md) for in-depth answers covering ADK vs Vertex AI Agent Builder, inter-agent communication design, human-in-the-loop architecture, Firestore vs BigQuery, severity scoring, failure recovery, production deployment, cost, and security controls.
 
 ---
 
@@ -236,6 +211,27 @@ See [docs/QA.md](docs/QA.md) for in-depth answers covering ADK vs Vertex AI Agen
 - Blast radius: elevated permissions allow lateral movement, all resources accessible by principal at risk
 - Remediation: human approval requested (CRITICAL severity)
 - Resolution time: 43 seconds
+
+---
+
+## Q&A
+
+See [docs/QA.md](docs/QA.md) for in-depth answers covering ADK vs Vertex AI Agent Builder, inter-agent communication design, human-in-the-loop architecture, Firestore vs BigQuery, severity scoring, failure recovery, production deployment, cost, and security controls.
+
+---
+
+## Disclaimer
+
+Built as a portfolio project for educational and demonstration purposes. Not intended for production use without further hardening, security review, and compliance validation.
+
+---
+
+## Author
+
+**Gregory B. Horne**
+Cloud Solutions Architect
+
+[GitHub: gbhorne](https://github.com/gbhorne) | [LinkedIn](https://linkedin.com/in/gbhorne)
 
 ---
 

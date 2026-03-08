@@ -198,6 +198,44 @@ adk-autosoc/
 
 ---
 
+## Screenshots
+
+### PUBLIC_BUCKET Investigation
+
+**Step 1: Detection and triage start**
+![Detection and triage start](docs/screenshots/autosoc_agent_01_detection_triage_start.png)
+
+**Step 2: Triage complete, routing to threat intel**
+![Triage complete](docs/screenshots/autosoc_agent_02_triage_complete_threat_intel.png)
+
+**Step 3: Forensics complete, routing to remediation**
+![Forensics complete](docs/screenshots/autosoc_agent_03_forensics_complete_remediation.png)
+
+**Step 4: Report complete - full incident summary**
+![Report complete](docs/screenshots/autosoc_agent_04_report_complete_incident_summary.png)
+
+**ADK trace: full execution tree with timing**
+![ADK trace execution tree](docs/screenshots/autosoc_agent_05_adk_trace_execution_tree.png)
+
+### PRIVILEGE_ESCALATION Investigation
+
+**Detection and triage - CRITICAL severity**
+![Privilege escalation detection](docs/screenshots/autosoc_agent_06_priv_escalation_detection_triage.png)
+
+**Triage score 8/10 - MITRE T1078 mapped**
+![Triage score 8](docs/screenshots/autosoc_agent_07_priv_escalation_triage_score8_mitre_t1078.png)
+
+**Forensics - lateral movement blast radius**
+![Forensics lateral movement](docs/screenshots/autosoc_agent_08_priv_escalation_forensics_lateral_movement.png)
+
+**Reporting - CISO-ready summary**
+![CISO summary](docs/screenshots/autosoc_agent_09_priv_escalation_report_ciso_summary.png)
+
+**ADK trace - 43 second resolution**
+![Trace 43 seconds](docs/screenshots/autosoc_agent_10_priv_escalation_trace_43sec.png)
+
+---
+
 ## Investigation Examples
 
 ### PUBLIC_BUCKET (Score 7/10)
